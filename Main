@@ -1,0 +1,163 @@
+import java.util.Random;
+import java.util.Scanner;
+
+public class Main {
+    public static void main(String[] args) {
+
+        //Declaration and Initialization of all variables I'll need for this project
+        Scanner keyboard = new Scanner(System.in);
+        int choice;
+        int players = 1;
+        int rounds = 3;
+        int round = 1;
+        int playerOneSelection = 0;
+        int playerTwoSelection = 0;
+        boolean isPlayerTurn = true;
+        boolean isSinglePlayer = true;
+        int playerOneScore = 0;
+        int playerTwoScore = 0;
+        //Need a random number if playing against a computer
+        Random random = new Random();
+
+
+        //Prisoner's Dilemma Menu screens
+        String chart = "\n             Cooperate      Defect\n" +
+                       "           __________________________\n" +
+                       "          |            |             |\n" +
+                       "Cooperate |   (3,3)    |    (0,5)    |\n" +
+                       "          |            |             |\n" +
+                       "          |____________|_____________|\n" +
+                       "          |            |             |\n" +
+                       " Defect   |   (5,0)    |    (1,1)    |\n" +
+                       "          |            |             |\n" +
+                       "          |____________|_____________|\n";
+
+        String title = "\n" +
+                       "__________        .__                                /\\        ________  .__.__                                 \n" +
+                       "\\______   \\_______|__| __________   ____   __________)/ ______ \\______ \\ |__|  |   ____   _____   _____ _____   \n" +
+                       " |     ___/\\_  __ \\  |/  ___/  _ \\ /    \\_/ __ \\_  __ \\/  ___/  |    |  \\|  |  | _/ __ \\ /     \\ /     \\\\__  \\  \n" +
+                       " |    |     |  | \\/  |\\___ (  <_> )   |  \\  ___/|  | \\/\\___ \\   |    `   \\  |  |_\\  ___/|  Y Y  \\  Y Y  \\/ __ \\_\n" +
+                       " |____|     |__|  |__/____  >____/|___|  /\\___  >__|  /____  > /_______  /__|____/\\___  >__|_|  /__|_|  (____  /\n" +
+                       "                          \\/           \\/     \\/           \\/          \\/             \\/      \\/      \\/     \\/ \n";
+
+        //Start out by displaying the title art. Want this to only show up once, so it's outside the loop.
+        System.out.println(title);
+        do { //loop until exit or end conditions are met
+            //Display main menu and player options
+            System.out.println("\n***Main Menu***");
+            System.out.println("1 - Players (" + players + ")");
+            System.out.println("2 - Rounds (" + rounds + ")");
+            System.out.println("3 - Play");
+            System.out.println("4 - Reset");
+            System.out.println("5 - Quit");
+            System.out.print("Enter Choice: ");
+            choice = keyboard.nextInt(); //Get user selections
+
+            switch (choice) {
+                //Change the number of players, defaults as 1, so you play against computer
+                // changes from single player mode if you select 2
+                case 1:
+                    System.out.print("Enter the number of players (up to 2): ");
+                    players = keyboard.nextInt();
+                    if (players == 1) {
+                        isSinglePlayer = true;
+                    } else {
+                        isSinglePlayer = false;
+                    }
+                    break;
+                //Change the number of rounds you'd like to play. Defaults to 3.
+                case 2:
+                    System.out.print("Enter the number of rounds you'd like to play: ");
+                    rounds = keyboard.nextInt();
+                    break;
+                //Actual game play new player menu
+                case 3:
+                    //loop until exit or end conditions met
+                    do {
+                        //Displays only for players, not for computer
+                        if (isPlayerTurn || !isSinglePlayer) {
+                            System.out.println(chart);
+                            System.out.println("Round: (" + round + "/" + rounds + ") Score - Player 1: " + playerOneScore + " Player 2: " + playerTwoScore);
+                            System.out.println("1 - Cooperate");
+                            System.out.println("2 - Defect");
+                            System.out.println("3 - Quit");
+                            System.out.print("Enter Choice: ");
+                        }
+
+                        if (isPlayerTurn) {
+                            playerTwoSelection = 0; //reset this to 0, so it doesn't trigger a game condition
+                            playerOneSelection = keyboard.nextInt();
+                            isPlayerTurn = !isPlayerTurn; //flip to other player or computer's turn
+                        } else {
+                            if (isSinglePlayer) {
+                                System.out.println("\nmy turn\n");
+                                playerTwoSelection = random.nextInt(2) + 1; //using random number 1 or 2 for computer selection
+                                isPlayerTurn = !isPlayerTurn;
+                            } else {
+                                playerTwoSelection = keyboard.nextInt(); //allows second player to enter selection
+                                isPlayerTurn = !isPlayerTurn;
+                            }
+                        }
+
+                        //All game conditions
+                        //Adds up the scores
+                        //Increments the round
+                        if (playerOneSelection == 1 && playerTwoSelection == 1) {
+                            System.out.println("You both Cooperated!");
+                            playerOneScore += 3;
+                            playerTwoScore += 3;
+                            round++;
+                        } else if (playerOneSelection == 1 && playerTwoSelection == 2) {
+                            System.out.println("You chose to Cooperate but the other player Defected!");
+                            playerTwoScore += 5;
+                            round++;
+                        } else if (playerOneSelection == 2 && playerTwoSelection == 1) {
+                            System.out.println("The other player chose to Cooperate but you Defected!");
+                            playerOneScore += 5;
+                            round++;
+                        } else if (playerOneSelection == 2 && playerTwoSelection == 2) {
+                            System.out.println("You both Defected!");
+                            playerOneScore += 1;
+                            playerTwoScore += 1;
+                            round++;
+                        }
+
+                        //Once the final round is complete, we compare scores to determine the winner
+                        //and display a message
+                        if (round == rounds + 1) {
+                            playerOneSelection = 3;
+                            System.out.println("\nFinal Score - Player 1: " + playerOneScore + " Player 2: " + playerTwoScore);
+                            if (playerOneScore > playerTwoScore) {
+                                System.out.println("Player 1 Wins!");
+                            } else if (playerOneScore < playerTwoScore) {
+                                System.out.println((isSinglePlayer ? "Computer" : "Player 2") + " Wins!");
+                            } else {
+                                System.out.println("It was a Tie!");
+                            }
+                        }
+                    } while (playerOneSelection != 3); //Keep playing until a win condition or player chooses 3
+                    break;
+                //Use this option to reset the game to default settings
+                case 4:
+                    players = 1;
+                    rounds = 3;
+                    round = 1;
+                    playerOneSelection = 0;
+                    playerTwoSelection = 0;
+                    isPlayerTurn = true;
+                    isSinglePlayer = true;
+                    playerOneScore = 0;
+                    playerTwoScore = 0;
+                    break;
+                //exits the outer game
+                case 5:
+                    System.out.println("Exiting...");
+                    break;
+                default:
+                    System.out.println("Nah, try something else...");
+            }
+        } while (choice != 5); //Continues until player enters 5 to exit
+    }
+}
+
+
